@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* Security: prevent text selection in sensitive areas */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
