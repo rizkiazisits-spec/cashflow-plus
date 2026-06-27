@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Wallet, TrendingUp, TrendingDown, ArrowUpRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import StatisticCard from '@/components/dashboard/StatisticCard'
 import RecentTransactions from '@/components/dashboard/RecentTransactions'
 import ExpenseChart from '@/components/charts/ExpenseChart'
@@ -7,6 +8,7 @@ import { useTransactions } from '@/hooks'
 
 function DashboardPage() {
   const { transactions, totalIncome, totalExpense, balance, isLoading } = useTransactions()
+  const navigate = useNavigate()
 
   if (isLoading) {
     return (
@@ -30,7 +32,10 @@ function DashboardPage() {
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-500 text-sm mt-1">Selamat datang di CashFlow+!</p>
         </div>
-        <button className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.02]">
+        <button
+          onClick={() => navigate('/dashboard/transactions')}
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.02]"
+        >
           <ArrowUpRight className="h-4 w-4" />
           Tambah Transaksi
         </button>

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, ShoppingBag, Coffee, Home, Briefcase, Gift } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import TransactionItem from './TransactionItem'
 import { Transaction } from '@/types/transaction'
 
@@ -16,6 +17,8 @@ const iconMap: Record<string, any> = {
 }
 
 function RecentTransactions({ transactions }: RecentTransactionsProps) {
+  const navigate = useNavigate()
+
   const getIcon = (category: string) => {
     return iconMap[category] || ShoppingBag
   }
@@ -32,7 +35,10 @@ function RecentTransactions({ transactions }: RecentTransactionsProps) {
           <h3 className="text-sm font-semibold text-gray-900">Transaksi Terbaru</h3>
           <p className="text-xs text-gray-400 mt-0.5">{transactions.length} transaksi</p>
         </div>
-        <button className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+        <button
+          onClick={() => navigate('/dashboard/transactions')}
+          className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+        >
           Lihat Semua
           <ArrowRight className="h-4 w-4" />
         </button>
