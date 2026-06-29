@@ -3,53 +3,32 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { X } from 'lucide-react'
-import { Goal, GoalInput } from '@/types/goal'
 import Input from '@/components/ui/Input'
-import InputCurrency from '@/components/ui/InputCurrency'
 
-const goalSchema = z.object({
+const groupSchema = z.object({
   name: z.string().min(1, 'Nama target wajib diisi'),
+  description: z.string().optional(),
   targetAmount: z.number().min(1, 'Nominal minimal Rp 1'),
   deadline: z.string().min(1, 'Deadline wajib diisi'),
-  description: z.string().optional(),
 })
 
-type GoalFormData = z.infer<typeof goalSchema>
+type GroupFormData = z.infer<typeof groupSchema>
 
-interface GoalFormProps {
+interface CreateGroupModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: GoalInput) => void
-  initialData?: Goal | null
+  onSubmit: (data: GroupFormData) => Promise<void>
 }
 
-function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
+function CreateGroupModal({ isOpen, onClose, onSubmit }: CreateGroupModalProps) {
   const {
     register,
     handleSubmit,
     reset,
-    watch,
-    setValue,
     formState: { errors, isSubmitting },
-  } = useForm<GoalFormData>({
-    resolver: zodResolver(goalSchema),
-    defaultValues: {
-      targetAmount: 0,
-    },
+  } = useForm<GroupFormData>({
+    resolver: zodResolver(groupSchema),
   })
-
-  const targetAmountValue = watch('targetAmount')
-
-  useEffect(() => {
-    if (initialData) {
-      reset({
-        name: initialData.name,
-        targetAmount: initialData.targetAmount,
-        deadline: initialData.deadline.split('T')[0],
-        description: initialData.description || '',
-      })
-    }
-  }, [initialData, reset])
 
   useEffect(() => {
     if (!isOpen) {
@@ -57,13 +36,8 @@ function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
     }
   }, [isOpen, reset])
 
-  const handleFormSubmit = (data: GoalFormData) => {
-    onSubmit({
-      name: data.name,
-      targetAmount: data.targetAmount,
-      deadline: new Date(data.deadline).toISOString(),
-      description: data.description,
-    })
+  const handleFormSubmit = async (data: GroupFormData) => {
+    await onSubmit(data)
     onClose()
   }
 
@@ -74,7 +48,7 @@ function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
       <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-2xl animate-in fade-in zoom-in duration-200 border border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-            {initialData ? 'Edit Target' : 'Tambah Target'}
+            Buat Target Bersama
           </h3>
           <button
             onClick={onClose}
@@ -92,11 +66,12 @@ function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
             {...register('name')}
           />
 
-          <InputCurrency
+          <Input
             label="Target Nominal"
-            value={targetAmountValue}
-            onValueChange={(val) => setValue('targetAmount', val || 0)}
+            type="number"
+            placeholder="0"
             error={errors.targetAmount?.message}
+            {...register('targetAmount', { valueAsNumber: true })}
           />
 
           <Input
@@ -131,7 +106,7 @@ function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
               disabled={isSubmitting}
               className="flex-1 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all disabled:opacity-50"
             >
-              {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+              {isSubmitting ? 'Menyimpan...' : 'Buat Target'}
             </button>
           </div>
         </form>
@@ -140,4 +115,4 @@ function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
   )
 }
 
-export default GoalForm
+export default CreateGroupModal

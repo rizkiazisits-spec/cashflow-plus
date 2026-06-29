@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { X } from 'lucide-react'
 import { Budget, BudgetInput } from '@/types/budget'
 import Input from '@/components/ui/Input'
+import InputCurrency from '@/components/ui/InputCurrency'
 
 const budgetSchema = z.object({
   category: z.string().min(1, 'Kategori wajib diisi'),
@@ -31,13 +32,18 @@ function BudgetForm({
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<BudgetFormData>({
     resolver: zodResolver(budgetSchema),
     defaultValues: {
       month: new Date().toISOString().slice(0, 7),
+      amount: 0,
     },
   })
+
+  const amountValue = watch('amount')
 
   useEffect(() => {
     if (initialData) {
@@ -67,15 +73,15 @@ function BudgetForm({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-2xl animate-in fade-in zoom-in duration-200 border border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-gray-900">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {initialData ? 'Edit Budget' : 'Tambah Budget'}
           </h3>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+            className="rounded-lg p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -88,13 +94,14 @@ function BudgetForm({
             error={errors.category?.message}
             {...register('category')}
           />
-          <Input
+
+          <InputCurrency
             label="Nominal Budget"
-            type="number"
-            placeholder="0"
+            value={amountValue}
+            onValueChange={(val) => setValue('amount', val || 0)}
             error={errors.amount?.message}
-            {...register('amount', { valueAsNumber: true })}
           />
+
           <Input
             label="Bulan"
             type="month"
@@ -106,7 +113,7 @@ function BudgetForm({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               Batal
             </button>

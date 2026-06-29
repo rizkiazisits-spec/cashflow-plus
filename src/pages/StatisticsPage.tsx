@@ -5,8 +5,10 @@ import {
   TrendingDown,
   Wallet,
   Calendar,
+  FileText,
 } from 'lucide-react'
 import { useTransactions } from '@/hooks'
+import { generatePDFReport } from '@/lib/pdfExport'
 import {
   LineChart,
   Line,
@@ -23,16 +25,32 @@ import {
   Area,
 } from 'recharts'
 
-const COLORS = ['#6366f1', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#fb923c', '#facc15']
+const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#f43f5e']
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-xl bg-white dark:bg-gray-800 p-3 shadow-lg border border-gray-100 dark:border-gray-700">
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{label}</p>
+        {payload.map((p: any) => (
+          <p key={p.name} className="text-sm font-semibold" style={{ color: p.color }}>
+            {p.name}: Rp {p.value.toLocaleString('id-ID')}
+          </p>
+        ))}
+      </div>
+    )
+  }
+  return null
+}
 
 function StatisticsPage() {
-  const { transactions, isLoading } = useTransactions()
+  const { transactions } = useTransactions()
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const now = new Date()
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   })
+  const [isExporting, setIsExporting] = useState(false)
 
-  // Filter transaksi berdasarkan bulan terpilih
   const filteredTransactions = useMemo(() => {
     return transactions.filter((tx) => {
       const txDate = new Date(tx.date)
@@ -41,7 +59,6 @@ function StatisticsPage() {
     })
   }, [transactions, selectedMonth])
 
-  // Hitung total
   const totalIncome = filteredTransactions
     .filter((tx) => tx.type === 'income')
     .reduce((sum, tx) => sum + tx.amount, 0)
@@ -51,14 +68,7 @@ function StatisticsPage() {
     .reduce((sum, tx) => sum + tx.amount, 0)
 
   const balance = totalIncome - totalExpense
-  const avgIncome = filteredTransactions.filter((tx) => tx.type === 'income').length > 0
-    ? totalIncome / filteredTransactions.filter((tx) => tx.type === 'income').length
-    : 0
-  const avgExpense = filteredTransactions.filter((tx) => tx.type === 'expense').length > 0
-    ? totalExpense / filteredTransactions.filter((tx) => tx.type === 'expense').length
-    : 0
 
-  // Data untuk grafik Income vs Expense per bulan (6 bulan terakhir)
   const monthlyData = useMemo(() => {
     const months = []
     const now = new Date()
@@ -86,7 +96,6 @@ function StatisticsPage() {
     return months
   }, [transactions])
 
-  // Data untuk Expense by Category (donut chart)
   const expenseByCategory = useMemo(() => {
     const categoryMap: Record<string, number> = {}
     filteredTransactions
@@ -97,7 +106,6 @@ function StatisticsPage() {
     return Object.entries(categoryMap).map(([name, value]) => ({ name, value }))
   }, [filteredTransactions])
 
-  // Data untuk Income by Category (donut chart)
   const incomeByCategory = useMemo(() => {
     const categoryMap: Record<string, number> = {}
     filteredTransactions
@@ -108,37 +116,31 @@ function StatisticsPage() {
     return Object.entries(categoryMap).map(([name, value]) => ({ name, value }))
   }, [filteredTransactions])
 
-  // Format currency
   const formatCurrency = (value: number) => {
     return `Rp ${value.toLocaleString('id-ID')}`
   }
 
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="rounded-xl bg-white p-3 shadow-lg border border-gray-100">
-          <p className="text-xs font-medium text-gray-500">{label}</p>
-          {payload.map((p: any) => (
-            <p key={p.name} className="text-sm font-semibold" style={{ color: p.color }}>
-              {p.name}: {formatCurrency(p.value)}
-            </p>
-          ))}
-        </div>
-      )
-    }
-    return null
-  }
+  const handleExportPDF = async () => {
+    setIsExporting(true)
+    try {
+      const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
+      const [year, month] = selectedMonth.split('-')
+      const period = `${monthNames[parseInt(month) - 1]} ${year}`
 
-  if (isLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-          <p className="mt-2 text-sm text-gray-500">Memuat statistik...</p>
-        </div>
-      </div>
-    )
+      await generatePDFReport({
+        transactions: filteredTransactions,
+        totalIncome,
+        totalExpense,
+        balance,
+        period,
+        filename: `laporan-cashflow-${selectedMonth}.pdf`,
+      })
+    } catch (error) {
+      console.error('Gagal ekspor PDF:', error)
+      alert('❌ Gagal membuat PDF. Silakan coba lagi.')
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   return (
@@ -147,96 +149,105 @@ function StatisticsPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Statistik Keuangan</h1>
-          <p className="text-gray-500 text-sm mt-1">Analisis pemasukan dan pengeluaran Anda</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Statistik Keuangan</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+            Analisis pemasukan dan pengeluaran Anda
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <input
             type="month"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
-            className="rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+            className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:text-white"
           />
+          <button
+            onClick={handleExportPDF}
+            disabled={isExporting || filteredTransactions.length === 0}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            <FileText className="h-4 w-4" />
+            {isExporting ? '⏳ Memproses...' : '📄 Ekspor PDF'}
+          </button>
         </div>
       </div>
 
-      {/* Summary Cards */}
       <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-2">
-            <Wallet className="h-4 w-4 text-blue-500" />
-            <p className="text-xs text-gray-500">Saldo</p>
+            <Wallet className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+            <p className="text-xs text-gray-500 dark:text-gray-400">Saldo</p>
           </div>
-          <p className={`text-lg font-bold mt-1 ${balance >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+          <p className={`text-lg font-bold mt-1 ${balance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
             {formatCurrency(balance)}
           </p>
         </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-emerald-500" />
-            <p className="text-xs text-gray-500">Pemasukan</p>
+            <TrendingUp className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
+            <p className="text-xs text-gray-500 dark:text-gray-400">Pemasukan</p>
           </div>
-          <p className="text-lg font-bold text-emerald-600 mt-1">
+          <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-1">
             {formatCurrency(totalIncome)}
           </p>
         </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-2">
-            <TrendingDown className="h-4 w-4 text-rose-500" />
-            <p className="text-xs text-gray-500">Pengeluaran</p>
+            <TrendingDown className="h-4 w-4 text-rose-500 dark:text-rose-400" />
+            <p className="text-xs text-gray-500 dark:text-gray-400">Pengeluaran</p>
           </div>
-          <p className="text-lg font-bold text-rose-600 mt-1">
+          <p className="text-lg font-bold text-rose-600 dark:text-rose-400 mt-1">
             {formatCurrency(totalExpense)}
           </p>
         </div>
-        <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-purple-500" />
-            <p className="text-xs text-gray-500">Transaksi</p>
+            <Calendar className="h-4 w-4 text-purple-500 dark:text-purple-400" />
+            <p className="text-xs text-gray-500 dark:text-gray-400">Transaksi</p>
           </div>
-          <p className="text-lg font-bold text-gray-900 mt-1">
+          <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
             {filteredTransactions.length}
           </p>
         </div>
       </div>
 
-      {/* Charts Grid */}
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Income vs Expense (Area Chart) */}
-        <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Pemasukan vs Pengeluaran (6 Bulan)</h3>
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+            📈 Pemasukan vs Pengeluaran (6 Bulan)
+          </h3>
           <ResponsiveContainer width="100%" height={250}>
             <AreaChart data={monthlyData}>
               <defs>
                 <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" strokeOpacity={0.4} />
               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#9ca3af' }} />
               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#9ca3af' }} tickFormatter={(v) => `Rp ${(v/1000)}k`} />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <Area type="monotone" dataKey="income" stroke="#6366f1" fill="url(#incomeGradient)" name="Pemasukan" />
+              <Area type="monotone" dataKey="income" stroke="#3b82f6" fill="url(#incomeGradient)" name="Pemasukan" />
               <Area type="monotone" dataKey="expense" stroke="#f43f5e" fill="url(#expenseGradient)" name="Pengeluaran" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Balance Trend (Line Chart) */}
-        <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Tren Saldo</h3>
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+            📊 Tren Saldo
+          </h3>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" strokeOpacity={0.4} />
               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#9ca3af' }} />
               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#9ca3af' }} tickFormatter={(v) => `Rp ${(v/1000)}k`} />
               <Tooltip content={<CustomTooltip />} />
@@ -245,11 +256,14 @@ function StatisticsPage() {
           </ResponsiveContainer>
         </div>
 
-        {/* Expense by Category (Pie Chart) */}
-        <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Pengeluaran per Kategori</h3>
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+            🍩 Pengeluaran per Kategori
+          </h3>
           {expenseByCategory.length === 0 ? (
-            <div className="flex h-[200px] items-center justify-center text-gray-400 text-sm">Belum ada data pengeluaran</div>
+            <div className="flex h-[200px] items-center justify-center text-sm text-gray-400 dark:text-gray-500">
+              ✨ Belum ada data
+            </div>
           ) : (
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -274,11 +288,14 @@ function StatisticsPage() {
           )}
         </div>
 
-        {/* Income by Category (Pie Chart) */}
-        <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Pemasukan per Kategori</h3>
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+            🍩 Pemasukan per Kategori
+          </h3>
           {incomeByCategory.length === 0 ? (
-            <div className="flex h-[200px] items-center justify-center text-gray-400 text-sm">Belum ada data pemasukan</div>
+            <div className="flex h-[200px] items-center justify-center text-sm text-gray-400 dark:text-gray-500">
+              ✨ Belum ada data
+            </div>
           ) : (
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -303,25 +320,36 @@ function StatisticsPage() {
           )}
         </div>
 
-        {/* Summary Stats */}
-        <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100 lg:col-span-2">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Ringkasan Bulan Ini</h3>
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700 lg:col-span-2">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+            📋 Ringkasan Bulan Ini
+          </h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
-              <p className="text-xs text-gray-500">Total Transaksi</p>
-              <p className="text-lg font-bold text-gray-900">{filteredTransactions.length}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Total Transaksi</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white">{filteredTransactions.length}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Rata-rata Pemasukan</p>
-              <p className="text-lg font-bold text-emerald-600">{formatCurrency(avgIncome)}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Rata-rata Pemasukan</p>
+              <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                {filteredTransactions.filter(t => t.type === 'income').length > 0
+                  ? formatCurrency(totalIncome / filteredTransactions.filter(t => t.type === 'income').length)
+                  : 'Rp 0'
+                }
+              </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Rata-rata Pengeluaran</p>
-              <p className="text-lg font-bold text-rose-600">{formatCurrency(avgExpense)}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Rata-rata Pengeluaran</p>
+              <p className="text-lg font-bold text-rose-600 dark:text-rose-400">
+                {filteredTransactions.filter(t => t.type === 'expense').length > 0
+                  ? formatCurrency(totalExpense / filteredTransactions.filter(t => t.type === 'expense').length)
+                  : 'Rp 0'
+                }
+              </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">Jumlah Kategori</p>
-              <p className="text-lg font-bold text-gray-900">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Jumlah Kategori</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white">
                 {new Set(filteredTransactions.map((tx) => tx.category)).size}
               </p>
             </div>

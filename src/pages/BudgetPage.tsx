@@ -36,7 +36,7 @@ function BudgetPage() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-          <p className="mt-2 text-sm text-gray-500">Memuat budget...</p>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Memuat budget...</p>
         </div>
       </div>
     )
@@ -50,8 +50,8 @@ function BudgetPage() {
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Budget</h1>
-          <p className="text-gray-500 text-sm mt-1">Kelola anggaran per kategori</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Budget</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Kelola anggaran per kategori</p>
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
@@ -63,32 +63,32 @@ function BudgetPage() {
       </div>
 
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500">Total Budget</p>
-          <p className="text-xl font-bold text-gray-900 mt-1">
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+          <p className="text-sm text-gray-500 dark:text-gray-400">Total Budget</p>
+          <p className="text-xl font-bold text-gray-900 dark:text-white mt-1">
             Rp {totalBudget.toLocaleString('id-ID')}
           </p>
         </div>
-        <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500">Total Pengeluaran</p>
-          <p className="text-xl font-bold text-rose-600 mt-1">
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+          <p className="text-sm text-gray-500 dark:text-gray-400">Total Pengeluaran</p>
+          <p className="text-xl font-bold text-rose-600 dark:text-rose-400 mt-1">
             Rp {totalSpent.toLocaleString('id-ID')}
           </p>
         </div>
-        <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500">Sisa Budget</p>
-          <p className="text-xl font-bold text-emerald-600 mt-1">
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+          <p className="text-sm text-gray-500 dark:text-gray-400">Sisa Budget</p>
+          <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
             Rp {(totalBudget - totalSpent).toLocaleString('id-ID')}
           </p>
         </div>
       </div>
 
       {budgets.length === 0 ? (
-        <div className="mt-8 flex h-64 items-center justify-center rounded-2xl border border-gray-100 bg-white">
+        <div className="mt-8 flex h-64 items-center justify-center rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="text-center">
-            <Wallet className="h-12 w-12 text-gray-300 mx-auto" />
-            <p className="text-gray-400 text-sm mt-3">Belum ada budget</p>
-            <p className="text-xs text-gray-300 mt-1">Tambahkan budget untuk mulai mengelola</p>
+            <Wallet className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto" />
+            <p className="text-gray-400 dark:text-gray-500 text-sm mt-3">Belum ada budget</p>
+            <p className="text-xs text-gray-300 dark:text-gray-600 mt-1">Tambahkan budget untuk mulai mengelola</p>
           </div>
         </div>
       ) : (

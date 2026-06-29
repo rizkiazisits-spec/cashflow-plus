@@ -7,7 +7,7 @@ function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const location = useLocation()
 
-  // Auto collapse sidebar setelah navigasi (semua ukuran layar)
+  // Auto collapse sidebar setelah navigasi (SEMUA ukuran layar)
   useEffect(() => {
     setIsSidebarOpen(false)
   }, [location.pathname])
@@ -17,11 +17,11 @@ function DashboardLayout() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
       <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Topbar onToggleSidebar={toggleSidebar} />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
           <Outlet />
         </main>
       </div>

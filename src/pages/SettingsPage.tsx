@@ -1,39 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'  // ← useEffect dihapus
 import { motion } from 'framer-motion'
 import { User, Mail, LogOut, Moon, Sun, Bell } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTheme } from '@/contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
+
+// ... sisanya sama
 
 function SettingsPage() {
   const { user, signOut } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
 
-  // State tema dari localStorage
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    const saved = localStorage.getItem('theme')
-    return (saved as 'light' | 'dark') || 'light'
-  })
-
   const [notifications, setNotifications] = useState(true)
-
-  // Efek untuk menerapkan tema ke html
-  useEffect(() => {
-    const html = document.documentElement
-    if (theme === 'dark') {
-      html.classList.add('dark')
-    } else {
-      html.classList.remove('dark')
-    }
-    localStorage.setItem('theme', theme)
-  }, [theme])
 
   const handleLogout = async () => {
     await signOut()
     navigate('/login')
-  }
-
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light')
   }
 
   return (

@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { X } from 'lucide-react'
 import { Transaction, TransactionInput } from '@/types/transaction'
 import Input from '@/components/ui/Input'
+import InputCurrency from '@/components/ui/InputCurrency'
 import { cn } from '@/lib/utils'
 
 const transactionSchema = z.object({
@@ -41,16 +42,19 @@ function TransactionForm({
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<TransactionFormData>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       type: 'expense',
       date: new Date().toISOString().split('T')[0],
+      amount: 0,
     },
   })
 
   const selectedType = watch('type')
+  const amountValue = watch('amount')
 
   useEffect(() => {
     if (initialData) {
@@ -86,15 +90,15 @@ function TransactionForm({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-2xl animate-in fade-in zoom-in duration-200 border border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-gray-900">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {initialData ? 'Edit Transaksi' : 'Tambah Transaksi'}
           </h3>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+            className="rounded-lg p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -110,53 +114,52 @@ function TransactionForm({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                 Tipe
               </label>
-              <div className="flex rounded-lg border border-gray-200 p-1 bg-gray-50/50">
+              <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 p-1 bg-gray-50/50 dark:bg-gray-800/50">
                 <button
                   type="button"
-                  onClick={() => reset({ ...watch(), type: 'income' })}
+                  onClick={() => setValue('type', 'income')}
                   className={cn(
                     'flex-1 rounded-md py-1.5 text-xs font-medium transition-colors',
                     selectedType === 'income'
-                      ? 'bg-white text-emerald-600 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                   )}
                 >
                   Pemasukan
                 </button>
                 <button
                   type="button"
-                  onClick={() => reset({ ...watch(), type: 'expense' })}
+                  onClick={() => setValue('type', 'expense')}
                   className={cn(
                     'flex-1 rounded-md py-1.5 text-xs font-medium transition-colors',
                     selectedType === 'expense'
-                      ? 'bg-white text-rose-600 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-white dark:bg-gray-700 text-rose-600 dark:text-rose-400 shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                   )}
                 >
                   Pengeluaran
                 </button>
               </div>
-              <input type="hidden" {...register('type')} value={selectedType} />
+              <input type="hidden" {...register('type')} />
             </div>
 
-            <Input
+            <InputCurrency
               label="Nominal"
-              type="number"
-              placeholder="0"
+              value={amountValue}
+              onValueChange={(val) => setValue('amount', val || 0)}
               error={errors.amount?.message}
-              {...register('amount', { valueAsNumber: true })}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               Kategori
             </label>
             <select
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:text-white"
               {...register('category')}
             >
               <option value="">Pilih kategori</option>
@@ -170,7 +173,7 @@ function TransactionForm({
               ))}
             </select>
             {errors.category && (
-              <p className="text-xs text-red-500 mt-1">{errors.category.message}</p>
+              <p className="text-xs text-red-500 dark:text-red-400 mt-1">{errors.category.message}</p>
             )}
           </div>
 
@@ -182,11 +185,11 @@ function TransactionForm({
           />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               Deskripsi (opsional)
             </label>
             <textarea
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none dark:text-white"
               rows={2}
               placeholder="Tambahkan catatan..."
               {...register('description')}
@@ -197,7 +200,7 @@ function TransactionForm({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               Batal
             </button>

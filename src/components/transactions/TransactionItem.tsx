@@ -25,11 +25,13 @@ function TransactionItem({
   const isIncome = type === 'income'
 
   return (
-    <div className="flex items-center gap-3 py-2.5 border-b border-gray-50 dark:border-gray-700 last:border-0">
+    <div className="flex items-center gap-3 py-2.5 border-b border-gray-50 dark:border-gray-700/50 last:border-0">
+      {/* Icon */}
       <div className={cn('rounded-xl p-2.5', iconBgColor)}>
         <Icon className={cn('h-5 w-5', iconColor)} />
       </div>
 
+      {/* Info */}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{title}</p>
         <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
@@ -39,6 +41,7 @@ function TransactionItem({
         </div>
       </div>
 
+      {/* Amount */}
       <p
         className={cn(
           'text-sm font-semibold',

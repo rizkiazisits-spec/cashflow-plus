@@ -13,6 +13,7 @@ import GoalsPage from '@/pages/GoalsPage'
 import StatisticsPage from '@/pages/StatisticsPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 import SettingsPage from '@/pages/SettingsPage'
+import GroupDetailPage from '@/pages/GroupDetailPage'
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,7 @@ export const router = createBrowserRouter([
           { path: 'goals', element: <GoalsPage /> },
           { path: 'statistics', element: <StatisticsPage /> },
           { path: 'settings', element: <SettingsPage /> },
+          { path: 'groups/:groupId', element: <GroupDetailPage /> },
         ],
       },
     ],

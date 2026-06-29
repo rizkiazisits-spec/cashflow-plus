@@ -2,28 +2,29 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X } from 'lucide-react'
-import { Goal, GoalInput } from '@/types/goal'
+import { X, Loader2 } from 'lucide-react'
 import Input from '@/components/ui/Input'
 import InputCurrency from '@/components/ui/InputCurrency'
+import { useGroups } from '@/hooks/useGroups'
 
-const goalSchema = z.object({
+const editGroupSchema = z.object({
   name: z.string().min(1, 'Nama target wajib diisi'),
+  description: z.string().optional(),
   targetAmount: z.number().min(1, 'Nominal minimal Rp 1'),
   deadline: z.string().min(1, 'Deadline wajib diisi'),
-  description: z.string().optional(),
 })
 
-type GoalFormData = z.infer<typeof goalSchema>
+type EditGroupFormData = z.infer<typeof editGroupSchema>
 
-interface GoalFormProps {
+interface EditGroupModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: GoalInput) => void
-  initialData?: Goal | null
+  group: any
+  onSuccess: () => void
 }
 
-function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
+function EditGroupModal({ isOpen, onClose, group, onSuccess }: EditGroupModalProps) {
+  const { editGroup } = useGroups()
   const {
     register,
     handleSubmit,
@@ -31,8 +32,8 @@ function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
     watch,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm<GoalFormData>({
-    resolver: zodResolver(goalSchema),
+  } = useForm<EditGroupFormData>({
+    resolver: zodResolver(editGroupSchema),
     defaultValues: {
       targetAmount: 0,
     },
@@ -41,15 +42,15 @@ function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
   const targetAmountValue = watch('targetAmount')
 
   useEffect(() => {
-    if (initialData) {
+    if (group && isOpen) {
       reset({
-        name: initialData.name,
-        targetAmount: initialData.targetAmount,
-        deadline: initialData.deadline.split('T')[0],
-        description: initialData.description || '',
+        name: group.name,
+        description: group.description || '',
+        targetAmount: group.targetAmount,
+        deadline: group.deadline.split('T')[0],
       })
     }
-  }, [initialData, reset])
+  }, [group, isOpen, reset])
 
   useEffect(() => {
     if (!isOpen) {
@@ -57,34 +58,41 @@ function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
     }
   }, [isOpen, reset])
 
-  const handleFormSubmit = (data: GoalFormData) => {
-    onSubmit({
-      name: data.name,
-      targetAmount: data.targetAmount,
-      deadline: new Date(data.deadline).toISOString(),
-      description: data.description,
-    })
-    onClose()
+  const onSubmit = async (data: EditGroupFormData) => {
+    if (!group) return
+    try {
+      await editGroup({
+        groupId: group.id,
+        input: {
+          name: data.name,
+          description: data.description,
+          targetAmount: data.targetAmount,
+          deadline: new Date(data.deadline).toISOString(),
+        },
+      })
+      onSuccess()
+      onClose()
+    } catch (error) {
+      alert('Gagal mengupdate target')
+    }
   }
 
   if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 dark:bg-black/70 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-2xl animate-in fade-in zoom-in duration-200 border border-gray-100 dark:border-gray-700">
+      <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-2xl border border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-            {initialData ? 'Edit Target' : 'Tambah Target'}
-          </h3>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">Edit Target</h3>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="rounded-lg p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
             label="Nama Target"
             placeholder="Contoh: Liburan ke Bali"
@@ -129,9 +137,16 @@ function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all disabled:opacity-50"
+              className="flex-1 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                'Simpan Perubahan'
+              )}
             </button>
           </div>
         </form>
@@ -140,4 +155,4 @@ function GoalForm({ isOpen, onClose, onSubmit, initialData }: GoalFormProps) {
   )
 }
 
-export default GoalForm
+export default EditGroupModal

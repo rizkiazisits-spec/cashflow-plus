@@ -40,26 +40,27 @@ function RegisterPage() {
       transition={{ duration: 0.4 }}
       className="max-w-md mx-auto mt-12"
     >
-      <h2 className="text-2xl font-bold text-gray-900 text-center">Buat Akun Baru</h2>
-      <p className="text-sm text-gray-500 text-center mt-1">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center">Buat Akun Baru</h2>
+      <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">
         Sudah punya akun?{' '}
-        <Link to="/login" className="text-blue-600 hover:underline cursor-pointer font-medium">
+        <Link to="/login" className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer font-medium">
           Masuk
         </Link>
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-4">
           {authError && (
-            <div className="rounded-lg bg-rose-50 p-3 text-sm text-rose-600 border border-rose-100">
+            <div className="rounded-lg bg-rose-50 dark:bg-rose-900/30 p-3 text-sm text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-800">
               {authError}
             </div>
           )}
           {successMessage && (
-            <div className="rounded-lg bg-emerald-50 p-3 text-sm text-emerald-600 border border-emerald-100">
+            <div className="rounded-lg bg-emerald-50 dark:bg-emerald-900/30 p-3 text-sm text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800">
               {successMessage}
             </div>
           )}
+
           <Input
             label="Nama Lengkap"
             type="text"
@@ -67,6 +68,7 @@ function RegisterPage() {
             error={errors.name?.message}
             {...register('name')}
           />
+
           <Input
             label="Email"
             type="email"
@@ -74,18 +76,21 @@ function RegisterPage() {
             error={errors.email?.message}
             {...register('email')}
           />
+
           <PasswordInput
             label="Kata Sandi"
             placeholder="Minimal 6 karakter"
             error={errors.password?.message}
             {...register('password')}
           />
+
           <PasswordInput
             label="Konfirmasi Kata Sandi"
             placeholder="••••••••"
             error={errors.confirmPassword?.message}
             {...register('confirmPassword')}
           />
+
           <button
             type="submit"
             disabled={isSubmitting}

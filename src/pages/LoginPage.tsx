@@ -37,21 +37,22 @@ function LoginPage() {
       transition={{ duration: 0.4 }}
       className="max-w-md mx-auto mt-12"
     >
-      <h2 className="text-2xl font-bold text-gray-900 text-center">Masuk ke Akun</h2>
-      <p className="text-sm text-gray-500 text-center mt-1">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white text-center">Masuk ke Akun</h2>
+      <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">
         Belum punya akun?{' '}
-        <Link to="/register" className="text-blue-600 hover:underline cursor-pointer font-medium">
+        <Link to="/register" className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer font-medium">
           Daftar
         </Link>
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-4">
           {authError && (
-            <div className="rounded-lg bg-rose-50 p-3 text-sm text-rose-600 border border-rose-100">
+            <div className="rounded-lg bg-rose-50 dark:bg-rose-900/30 p-3 text-sm text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-800">
               {authError}
             </div>
           )}
+
           <Input
             label="Email"
             type="email"
@@ -59,17 +60,20 @@ function LoginPage() {
             error={errors.email?.message}
             {...register('email')}
           />
+
           <PasswordInput
             label="Kata Sandi"
             placeholder="••••••••"
             error={errors.password?.message}
             {...register('password')}
           />
+
           <div className="flex justify-end">
-            <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline font-medium transition-colors">
+            <Link to="/forgot-password" className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium transition-colors">
               Lupa Password?
             </Link>
           </div>
+
           <button
             type="submit"
             disabled={isSubmitting}

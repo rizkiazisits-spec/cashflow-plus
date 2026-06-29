@@ -44,32 +44,27 @@ function TransactionFilters({
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3">
-        {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
             placeholder="Cari transaksi..."
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 bg-gray-50/80 py-2 pl-9 pr-4 text-sm outline-none transition-all placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20"
+            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/80 py-2 pl-9 pr-4 text-sm outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20 dark:text-white"
           />
         </div>
-
-        {/* Filter toggle button (mobile) */}
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors sm:hidden"
+          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors sm:hidden"
         >
           <Filter className="h-4 w-4" />
           Filter
         </button>
       </div>
 
-      {/* Filter options */}
       <div className={cn('flex flex-wrap gap-3', !showFilters && 'hidden sm:flex')}>
-        {/* Type filter */}
-        <div className="flex items-center gap-1 rounded-lg border border-gray-200 p-1 bg-gray-50/50">
+        <div className="flex items-center gap-1 rounded-lg border border-gray-200 dark:border-gray-700 p-1 bg-gray-50/50 dark:bg-gray-800/50">
           {typeOptions.map((option) => (
             <button
               key={option.value}
@@ -77,8 +72,8 @@ function TransactionFilters({
               className={cn(
                 'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
                 selectedType === option.value
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
               )}
             >
               {option.label}
@@ -86,11 +81,10 @@ function TransactionFilters({
           ))}
         </div>
 
-        {/* Category filter */}
         <select
           value={selectedCategory}
           onChange={(e) => handleCategoryChange(e.target.value)}
-          className="rounded-lg border border-gray-200 bg-gray-50/80 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+          className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/80 px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:text-white dark:focus:border-blue-400"
         >
           <option value="all">Semua Kategori</option>
           {categories.map((cat) => (

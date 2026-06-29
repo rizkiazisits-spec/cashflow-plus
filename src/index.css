@@ -1,5 +1,79 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ===== PAKSA WARNA NAVY DI DARK MODE ===== */
+.dark {
+  background-color: #0f172a !important;
+}
+
+.dark .bg-white {
+  background-color: #1e293b !important;
+}
+.dark .bg-gray-50 {
+  background-color: #0f172a !important;
+}
+.dark .bg-gray-100 {
+  background-color: #1e293b !important;
+}
+.dark .bg-gray-200 {
+  background-color: #334155 !important;
+}
+.dark .bg-gray-800 {
+  background-color: #1e293b !important;
+}
+.dark .bg-gray-900 {
+  background-color: #0f172a !important;
+}
+.dark .border-gray-100 {
+  border-color: #334155 !important;
+}
+.dark .border-gray-200 {
+  border-color: #334155 !important;
+}
+.dark .text-gray-900 {
+  color: #f1f5f9 !important;
+}
+.dark .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+.dark .text-gray-500 {
+  color: #94a3b8 !important;
+}
+.dark .text-gray-400 {
+  color: #94a3b8 !important;
+}
+.dark .bg-slate-50 {
+  background-color: #0f172a !important;
+}
+.dark .bg-slate-100 {
+  background-color: #1e293b !important;
+}
+.dark .bg-slate-800 {
+  background-color: #1e293b !important;
+}
+.dark .bg-slate-900 {
+  background-color: #0f172a !important;
+}
+.dark .border-slate-100 {
+  border-color: #334155 !important;
+}
+.dark .border-slate-200 {
+  border-color: #334155 !important;
+}
+.dark .text-slate-900 {
+  color: #f1f5f9 !important;
+}
+.dark .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+.dark .text-slate-500 {
+  color: #94a3b8 !important;
+}
+.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
 /* Security: prevent text selection in sensitive areas */
 .no-select {
   user-select: none;

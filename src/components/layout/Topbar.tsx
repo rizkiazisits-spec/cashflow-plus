@@ -1,6 +1,7 @@
-import { Search, Menu, Settings, LogOut, ChevronDown } from 'lucide-react'
+import { Search, Menu, Settings, LogOut, ChevronDown, Sun, Moon } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTheme } from '@/contexts/ThemeContext' // ← import useTheme
 import { useNavigate, Link } from 'react-router-dom'
 
 interface TopbarProps {
@@ -9,6 +10,7 @@ interface TopbarProps {
 
 function Topbar({ onToggleSidebar }: TopbarProps) {
   const { user, signOut } = useAuth()
+  const { theme, toggleTheme } = useTheme() // ← gunakan theme & toggle
   const navigate = useNavigate()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -34,65 +36,76 @@ function Topbar({ onToggleSidebar }: TopbarProps) {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/80 backdrop-blur-sm px-4 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm px-4 sm:px-6">
       <div className="flex flex-1 items-center gap-4">
         <button
           onClick={onToggleSidebar}
-          className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+          className="rounded-lg p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
           aria-label="Toggle sidebar"
         >
           <Menu className="h-5 w-5" />
         </button>
 
         <div className="relative max-w-md flex-1 lg:max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
             placeholder="Cari..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-gray-200 bg-gray-50/80 py-2 pl-9 pr-4 text-sm outline-none transition-all placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20"
+            className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/80 dark:bg-gray-800/80 py-2 pl-9 pr-4 text-sm outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:focus:border-blue-400 dark:focus:ring-blue-400/20"
           />
         </div>
       </div>
 
-      <div className="relative" ref={dropdownRef}>
+      <div className="flex items-center gap-2">
+        {/* Tombol toggle tema */}
         <button
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="flex items-center gap-2 rounded-full p-1.5 pr-3 hover:bg-gray-100 transition-colors"
+          onClick={toggleTheme}
+          className="rounded-lg p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          aria-label="Toggle theme"
         >
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
-            {initial}
-          </div>
-          <span className="hidden text-sm font-medium text-gray-700 sm:inline-block">
-            {displayName}
-          </span>
-          <ChevronDown className="h-4 w-4 text-gray-400" />
+          {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
         </button>
 
-        {isDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white shadow-lg border border-gray-100 py-1 overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-100">
-              <p className="text-sm font-medium text-gray-900">{displayName}</p>
-              <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="flex items-center gap-2 rounded-full p-1.5 pr-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          >
+            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+              {initial}
             </div>
-            <Link
-              to="/dashboard/settings"
-              onClick={() => setIsDropdownOpen(false)}
-              className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              <Settings className="h-4 w-4" />
-              Pengaturan
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-            >
-              <LogOut className="h-4 w-4" />
-              Keluar
-            </button>
-          </div>
-        )}
+            <span className="hidden text-sm font-medium text-gray-700 dark:text-gray-300 sm:inline-block">
+              {displayName}
+            </span>
+            <ChevronDown className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+          </button>
+
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 py-1 overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{displayName}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
+              </div>
+              <Link
+                to="/dashboard/settings"
+                onClick={() => setIsDropdownOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              >
+                <Settings className="h-4 w-4" />
+                Pengaturan
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                Keluar
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   )

@@ -91,7 +91,7 @@ function TransactionsPage() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-          <p className="mt-2 text-sm text-gray-500">Memuat transaksi...</p>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Memuat transaksi...</p>
         </div>
       </div>
     )
@@ -105,8 +105,8 @@ function TransactionsPage() {
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Transaksi</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Transaksi</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
             Kelola semua pemasukan dan pengeluaran Anda
           </p>
         </div>

@@ -15,7 +15,7 @@ function DashboardPage() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-          <p className="mt-2 text-sm text-gray-500">Memuat data...</p>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Memuat data...</p>
         </div>
       </div>
     )
@@ -29,8 +29,8 @@ function DashboardPage() {
     >
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500 text-sm mt-1">Selamat datang di CashFlow+!</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Selamat datang di CashFlow+!</p>
         </div>
         <button
           onClick={() => navigate('/dashboard/transactions')}
@@ -46,24 +46,24 @@ function DashboardPage() {
           title="Total Saldo"
           value={`Rp ${balance.toLocaleString('id-ID')}`}
           icon={Wallet}
-          iconBgColor="bg-blue-50"
-          iconColor="text-blue-600"
+          iconBgColor="bg-blue-50 dark:bg-blue-900/30"
+          iconColor="text-blue-600 dark:text-blue-400"
           trend={{ value: 12.5, isPositive: true }}
         />
         <StatisticCard
           title="Pemasukan"
           value={`Rp ${totalIncome.toLocaleString('id-ID')}`}
           icon={TrendingUp}
-          iconBgColor="bg-blue-50"
-          iconColor="text-blue-600"
+          iconBgColor="bg-blue-50 dark:bg-blue-900/30"
+          iconColor="text-blue-600 dark:text-blue-400"
           trend={{ value: 8.2, isPositive: true }}
         />
         <StatisticCard
           title="Pengeluaran"
           value={`Rp ${totalExpense.toLocaleString('id-ID')}`}
           icon={TrendingDown}
-          iconBgColor="bg-blue-50"
-          iconColor="text-blue-600"
+          iconBgColor="bg-blue-50 dark:bg-blue-900/30"
+          iconColor="text-blue-600 dark:text-blue-400"
           trend={{ value: 3.1, isPositive: false }}
         />
       </div>
