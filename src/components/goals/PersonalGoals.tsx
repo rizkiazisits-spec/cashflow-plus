@@ -49,38 +49,42 @@ function PersonalGoals() {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 flex-1 mr-4">
-          <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-            <p className="text-xs text-gray-500 dark:text-gray-400">Total Target</p>
-            <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">{totalGoals}</p>
-          </div>
-          <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-            <p className="text-xs text-gray-500 dark:text-gray-400">Selesai</p>
-            <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-1">{completedGoals}</p>
-          </div>
-          <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-            <p className="text-xs text-gray-500 dark:text-gray-400">Total Tabungan</p>
-            <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-1">
-              Rp {totalSaved.toLocaleString('id-ID')}
-            </p>
-          </div>
-          <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
-            <p className="text-xs text-gray-500 dark:text-gray-400">Target Total</p>
-            <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
-              Rp {totalTarget.toLocaleString('id-ID')}
-            </p>
-          </div>
+      {/* Summary Cards - Tanpa tombol di samping */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+          <p className="text-xs text-gray-500 dark:text-gray-400">Total Target</p>
+          <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">{totalGoals}</p>
         </div>
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+          <p className="text-xs text-gray-500 dark:text-gray-400">Selesai</p>
+          <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-1">{completedGoals}</p>
+        </div>
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+          <p className="text-xs text-gray-500 dark:text-gray-400">Total Tabungan</p>
+          <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-1">
+            Rp {totalSaved.toLocaleString('id-ID')}
+          </p>
+        </div>
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+          <p className="text-xs text-gray-500 dark:text-gray-400">Target Total</p>
+          <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
+            Rp {totalTarget.toLocaleString('id-ID')}
+          </p>
+        </div>
+      </div>
+
+      {/* Tombol Tambah Target - Dipisah ke bawah */}
+      <div className="mb-6">
         <button
           onClick={() => setIsFormOpen(true)}
-          className="flex-shrink-0 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.02]"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.02]"
         >
           <Plus className="h-4 w-4" />
           Tambah Target
         </button>
       </div>
 
+      {/* Daftar Target */}
       {goals.length === 0 ? (
         <div className="flex h-64 items-center justify-center rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="text-center">
