@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, Sparkles, Zap, Shield } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 function Hero() {
+  const navigate = useNavigate()
+
   return (
     <section className="relative overflow-hidden pt-12 pb-20 bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 dark:from-blue-900 dark:via-indigo-900 dark:to-blue-950">
       {/* Background blobs */}
@@ -56,11 +59,17 @@ function Hero() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <button className="group inline-flex items-center gap-2 rounded-2xl bg-white dark:bg-gray-900 px-8 py-3.5 text-sm font-semibold text-blue-600 dark:text-blue-400 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+          <button
+            onClick={() => navigate('/register')}
+            className="group relative z-10 inline-flex items-center gap-2 rounded-2xl bg-white dark:bg-gray-900 px-8 py-3.5 text-sm font-semibold text-blue-600 dark:text-blue-400 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+          >
             Mulai Gratis
             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </button>
-          <button className="inline-flex items-center gap-2 rounded-2xl border border-white/30 dark:border-gray-600 bg-white/10 dark:bg-gray-800/30 backdrop-blur-sm px-8 py-3.5 text-sm font-semibold text-white dark:text-gray-200 hover:bg-white/20 dark:hover:bg-gray-700/30 transition-all duration-300">
+          <button
+            onClick={() => navigate('/login')}
+            className="relative z-10 inline-flex items-center gap-2 rounded-2xl border border-white/30 dark:border-gray-600 bg-white/10 dark:bg-gray-800/30 backdrop-blur-sm px-8 py-3.5 text-sm font-semibold text-white dark:text-gray-200 hover:bg-white/20 dark:hover:bg-gray-700/30 transition-all duration-300 cursor-pointer"
+          >
             <Zap className="h-4 w-4" />
             Lihat Demo
           </button>
